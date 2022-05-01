@@ -1,0 +1,11 @@
+//
+//  Item.swift
+//  Todoey
+//
+
+import Foundation
+
+class Item: Codable {
+    var title: String = ""
+    var done: Bool = false
+}
