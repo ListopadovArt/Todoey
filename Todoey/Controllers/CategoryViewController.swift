@@ -1,53 +1,42 @@
 //
-//  ViewController.swift
+//  CategoryViewController.swift
 //  Todoey
 //
 
 import UIKit
 import CoreData
 
-class ToDoListViewController: UITableViewController {
+class CategoryViewController: UITableViewController {
     
     
     // MARK: - Properties
-    var itemArray = [Item]()
+    var categoriesArray = [Categories]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    var selectedCategory: Categories? {
-        didSet {
-            loadItems()
-        }
-    }
     
     
     // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureNavigtionBarItems()
+        loadCategories()
     }
     
     
     // MARK: - Core Data Methods
-    func saveItems(){
+    func saveCategories(){
         do {
             try context.save()
         } catch {
-            print("Error saving item \(error)")
+            print("Error saving category \(error)")
         }
         self.tableView.reloadData()
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        if let additionalPredicate = predicate {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-        } else {
-            request.predicate = categoryPredicate
-        }
-        
+    func loadCategories(with request: NSFetchRequest<Categories> = Categories.fetchRequest()){
         do {
-            itemArray = try context.fetch(request)
+            categoriesArray = try context.fetch(request)
         } catch {
-            print("Error fetching data from items: \(error)")
+            print("Error fetching data from categories: \(error)")
         }
         self.tableView.reloadData()
     }
@@ -55,31 +44,31 @@ class ToDoListViewController: UITableViewController {
     
     //MARK: - TableView DataSource and Delegate Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemArray.count
+        return categoriesArray.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else {
             return UITableViewCell()
         }
-        let item = itemArray[indexPath.row]
-        cell.textLabel?.text = item.title
-        cell.accessoryType = item.done ? .checkmark : .none
-        
+        let category = categoriesArray[indexPath.row]
+        cell.textLabel?.text = category.name
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        saveItems()
-        tableView.deselectRow(at: indexPath, animated: true)
+        guard let controller = self.storyboard?.instantiateViewController(withIdentifier: "ToDoListViewController") as? ToDoListViewController else {
+            return
+        }
+        controller.selectedCategory = categoriesArray[indexPath.row]
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            context.delete(itemArray[indexPath.row])
-            self.itemArray.remove(at: indexPath.row)
-            saveItems()
+            context.delete(categoriesArray[indexPath.row])
+            self.categoriesArray.remove(at: indexPath.row)
+            saveCategories()
             self.tableView.reloadData()
         }
     }
@@ -110,54 +99,26 @@ class ToDoListViewController: UITableViewController {
     }
     
     
-    //MARK: - Add New Items
-    @IBAction func addButtunPressed(_ sender: UIBarButtonItem) {
+    //MARK: - Add New Categories
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         var textField = UITextField()
-        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
-        let action = UIAlertAction(title: "Add Item", style: .default) { action in
+        let alert = UIAlertController(title: "Add New Todoey Category", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add Category", style: .default) { action in
             
             if let text = textField.text {
                 if text != "" {
-                    let newItem = Item(context: self.context)
-                    newItem.title = text
-                    newItem.done = false
-                    newItem.parentCategory = self.selectedCategory
-                    self.itemArray.append(newItem)
-                    self.saveItems()
+                    let newCategory = Categories(context: self.context)
+                    newCategory.name = text
+                    self.categoriesArray.append(newCategory)
+                    self.saveCategories()
                 }
             }
         }
         alert.addTextField { alertTextField in
-            alertTextField.placeholder = "Create new item"
+            alertTextField.placeholder = "Create new category"
             textField = alertTextField
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
-    }
-}
-
-
-//MARK: - SearchBar Delegate Methods
-extension ToDoListViewController: UISearchBarDelegate {
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-        
-        let predicate = NSPredicate(format: "title CONTAINS %@", searchBar.text!)
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        
-        loadItems(with: request, predicate: predicate)
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
-        if searchBar.text?.count == 0 {
-            loadItems()
-            
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder()
-            }
-        }
     }
 }

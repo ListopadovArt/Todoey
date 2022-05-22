@@ -5,7 +5,7 @@
 
 import UIKit
 
-class ToDoItemCell: UITableViewCell {
+class ToDoCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
