@@ -5,6 +5,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class ToDoListViewController: UITableViewController {
     
@@ -23,6 +24,8 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureNavigtionBarItems()
+        tableView.rowHeight = 70
+        tableView.separatorStyle = .none
     }
     
     
@@ -55,6 +58,10 @@ class ToDoListViewController: UITableViewController {
         }
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
+            if let color = UIColor(selectedCategory!.color).darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
+                cell.backgroundColor = color
+                cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+            }
             cell.accessoryType = item.done ? .checkmark : .none
         } else {
             cell.textLabel?.text = "No Items Added Yet!"

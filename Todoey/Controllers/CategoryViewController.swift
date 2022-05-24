@@ -5,6 +5,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class CategoryViewController: UITableViewController {
     
@@ -20,6 +21,7 @@ class CategoryViewController: UITableViewController {
         configureNavigtionBarItems()
         loadCategories()
         tableView.rowHeight = 70
+        tableView.separatorStyle = .none
     }
     
     
@@ -118,7 +120,7 @@ class CategoryViewController: UITableViewController {
                 if text != "" {
                     let newCategory = Category()
                     newCategory.name = text
-                    newCategory.color = UIColor.random.hexString
+                    newCategory.color = UIColor.randomFlat().hexString
                     self.save(category: newCategory)
                 }
             }

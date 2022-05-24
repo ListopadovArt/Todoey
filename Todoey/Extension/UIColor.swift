@@ -10,13 +10,7 @@ import Foundation
 import UIKit
 
 extension UIColor {
-    static var random: UIColor {
-        return UIColor(red: .random(in: 0...1),
-                       green: .random(in: 0...1),
-                       blue: .random(in: 0...1),
-                       alpha: 1.0)
-    }
-    
+   
     var hexString: String {
         cgColor.components![0..<3]
             .map { String(format: "%02lX", Int($0 * 255)) }
