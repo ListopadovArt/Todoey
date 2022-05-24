@@ -18,12 +18,15 @@ class CategoryViewController: UITableViewController {
     // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureNavigtionBarItems()
         loadCategories()
         tableView.rowHeight = 70
         tableView.separatorStyle = .none
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNavigtionBarItems()
+    }
     
     // MARK: - Realm Methods
     func save(category: Category){
@@ -56,6 +59,7 @@ class CategoryViewController: UITableViewController {
         if let category = todoCategories?[indexPath.row] {
             cell.backgroundColor = UIColor(category.color)
             cell.textLabel?.text = category.name
+            cell.textLabel?.textColor = ContrastColorOf(UIColor(category.color), returnFlat: true)
         }
         return cell
     }
@@ -86,26 +90,22 @@ class CategoryViewController: UITableViewController {
     
     //MARK: - Configure NavigtionBar
     fileprivate func configureNavigtionBarItems() {
-        let navigationBar = navigationController?.navigationBar
-        if #available(iOS 13.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithDefaultBackground()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundColor = .systemBlue
-            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 24, weight: UIFont.Weight(900)),
-                                              NSAttributedString.Key.strikethroughColor: UIColor.white,
-            ]
-            navigationBar?.standardAppearance = appearance
-            navigationBar?.scrollEdgeAppearance = appearance
-            navigationController?.navigationBar.compactAppearance = appearance
-        } else {
-            let barAppearance = UINavigationBar.appearance()
-            navigationBar?.barTintColor = .systemBlue
-            navigationBar?.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-            navigationBar?.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 24, weight: UIFont.Weight(900))]
-            barAppearance.setBackgroundImage(UIImage(), for: UIBarPosition.any, barMetrics: UIBarMetrics.defaultPrompt)
-            barAppearance.shadowImage = UIImage()
+        guard let navBar = navigationController?.navigationBar else {
+            fatalError("Navigation Controller doesn't exist!")
         }
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundColor = .systemBlue
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 24, weight: UIFont.Weight(900)),
+                                          NSAttributedString.Key.strikethroughColor: UIColor.white,
+        ]
+        navBar.tintColor = UIColor.white
+        navBar.standardAppearance = appearance
+        navBar.scrollEdgeAppearance = appearance
+        navBar.compactAppearance = appearance
     }
     
     
