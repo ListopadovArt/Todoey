@@ -5,6 +5,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class ToDoListViewController: UITableViewController {
     
@@ -19,10 +20,21 @@ class ToDoListViewController: UITableViewController {
     }
     
     
+    // MARK: - IBOutlets
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    
     // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.rowHeight = 70
+        tableView.separatorStyle = .none
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         configureNavigtionBarItems()
+        title = selectedCategory?.name
     }
     
     
@@ -55,6 +67,10 @@ class ToDoListViewController: UITableViewController {
         }
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
+            if let color = UIColor(selectedCategory!.color).darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
+                cell.backgroundColor = color
+                cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+            }
             cell.accessoryType = item.done ? .checkmark : .none
         } else {
             cell.textLabel?.text = "No Items Added Yet!"
@@ -94,25 +110,23 @@ class ToDoListViewController: UITableViewController {
     
     //MARK: - Configure NavigtionBar
     fileprivate func configureNavigtionBarItems() {
-        let navigationBar = navigationController?.navigationBar
-        if #available(iOS 13.0, *) {
+        guard let navBar = navigationController?.navigationBar else {
+            fatalError("Navigation Controller doesn't exist!")
+        }
+        if let colorHex = selectedCategory?.color {
+            searchBar.barTintColor = UIColor(colorHex)
+            let navBarColor = ContrastColorOf(UIColor(colorHex), returnFlat: true)
             let appearance = UINavigationBarAppearance()
             appearance.configureWithDefaultBackground()
             appearance.configureWithTransparentBackground()
-            appearance.backgroundColor = .systemBlue
-            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 24, weight: UIFont.Weight(900)),
-                                              NSAttributedString.Key.strikethroughColor: UIColor.white,
-            ]
-            navigationBar?.standardAppearance = appearance
-            navigationBar?.scrollEdgeAppearance = appearance
-            navigationController?.navigationBar.compactAppearance = appearance
-        } else {
-            let barAppearance = UINavigationBar.appearance()
-            navigationBar?.barTintColor = .systemBlue
-            navigationBar?.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-            navigationBar?.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 24, weight: UIFont.Weight(900))]
-            barAppearance.setBackgroundImage(UIImage(), for: UIBarPosition.any, barMetrics: UIBarMetrics.defaultPrompt)
-            barAppearance.shadowImage = UIImage()
+            appearance.titleTextAttributes = [.foregroundColor: navBarColor]
+            appearance.largeTitleTextAttributes = [.foregroundColor: navBarColor]
+            appearance.backgroundColor = UIColor(colorHex)
+            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: navBarColor, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 24, weight: UIFont.Weight(900)), NSAttributedString.Key.strikethroughColor: navBarColor]
+            navBar.tintColor = navBarColor
+            navBar.standardAppearance = appearance
+            navBar.scrollEdgeAppearance = appearance
+            navBar.compactAppearance = appearance
         }
     }
     
