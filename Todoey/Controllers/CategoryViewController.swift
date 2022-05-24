@@ -4,14 +4,14 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
     
     
     // MARK: - Properties
-    var categoriesArray = [Categories]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
+    var todoCategories: Results<Category>?
     
     
     // MARK: - View Life Cycle
@@ -22,37 +22,34 @@ class CategoryViewController: UITableViewController {
     }
     
     
-    // MARK: - Core Data Methods
-    func saveCategories(){
+    // MARK: - Realm Methods
+    func save(category: Category){
         do {
-            try context.save()
+            try realm.write () {
+                realm.add(category)
+            }
         } catch {
             print("Error saving category \(error)")
         }
         self.tableView.reloadData()
     }
     
-    func loadCategories(with request: NSFetchRequest<Categories> = Categories.fetchRequest()){
-        do {
-            categoriesArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from categories: \(error)")
-        }
+    func loadCategories(){
+        todoCategories = realm.objects(Category.self)
         self.tableView.reloadData()
     }
     
     
     //MARK: - TableView DataSource and Delegate Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categoriesArray.count
+        return todoCategories?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else {
             return UITableViewCell()
         }
-        let category = categoriesArray[indexPath.row]
-        cell.textLabel?.text = category.name
+        cell.textLabel?.text = todoCategories?[indexPath.row].name ?? "No Categories Added Yet!"
         return cell
     }
     
@@ -60,17 +57,24 @@ class CategoryViewController: UITableViewController {
         guard let controller = self.storyboard?.instantiateViewController(withIdentifier: "ToDoListViewController") as? ToDoListViewController else {
             return
         }
-        controller.selectedCategory = categoriesArray[indexPath.row]
+        controller.selectedCategory = todoCategories?[indexPath.row]
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            context.delete(categoriesArray[indexPath.row])
-            self.categoriesArray.remove(at: indexPath.row)
-            saveCategories()
-            self.tableView.reloadData()
+            if let currentCategory = todoCategories?[indexPath.row] {
+                do {
+                    try realm.write {
+                        realm.delete(currentCategory)
+                    }
+                } catch {
+                    print("Error delete item, \(error)")
+                }
+                self.tableView.reloadData()
+            }
         }
+        self.tableView.reloadData()
     }
     
     
@@ -107,10 +111,9 @@ class CategoryViewController: UITableViewController {
             
             if let text = textField.text {
                 if text != "" {
-                    let newCategory = Categories(context: self.context)
+                    let newCategory = Category()
                     newCategory.name = text
-                    self.categoriesArray.append(newCategory)
-                    self.saveCategories()
+                    self.save(category: newCategory)
                 }
             }
         }
