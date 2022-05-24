@@ -19,6 +19,7 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
         configureNavigtionBarItems()
         loadCategories()
+        tableView.rowHeight = 70
     }
     
     
@@ -49,7 +50,11 @@ class CategoryViewController: UITableViewController {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else {
             return UITableViewCell()
         }
-        cell.textLabel?.text = todoCategories?[indexPath.row].name ?? "No Categories Added Yet!"
+        
+        if let category = todoCategories?[indexPath.row] {
+            cell.backgroundColor = UIColor(category.color)
+            cell.textLabel?.text = category.name
+        }
         return cell
     }
     
@@ -74,7 +79,6 @@ class CategoryViewController: UITableViewController {
                 self.tableView.reloadData()
             }
         }
-        self.tableView.reloadData()
     }
     
     
@@ -104,6 +108,7 @@ class CategoryViewController: UITableViewController {
     
     
     //MARK: - Add New Categories
+    @available(iOS 14.0, *)
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         var textField = UITextField()
         let alert = UIAlertController(title: "Add New Todoey Category", message: "", preferredStyle: .alert)
@@ -113,6 +118,7 @@ class CategoryViewController: UITableViewController {
                 if text != "" {
                     let newCategory = Category()
                     newCategory.name = text
+                    newCategory.color = UIColor.random.hexString
                     self.save(category: newCategory)
                 }
             }
