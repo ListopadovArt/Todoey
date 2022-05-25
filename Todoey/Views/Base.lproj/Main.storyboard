@@ -42,12 +42,15 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Items" id="YOD-bo-F2j">
                         <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="Ron-J6-LO8">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
                                 <action selector="addButtunPressed:" destination="YMC-iz-U8f" id="5Sa-6Z-A4P"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="searchBar" destination="0eG-q3-bTr" id="lfn-HA-ePE"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N0N-Te-t9b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -58,10 +61,9 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="X8r-ra-SYz" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="W8l-2k-ueR">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="W8l-2k-ueR">
+                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
@@ -98,7 +100,6 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Todoey" id="GEt-qt-P9d">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="EqN-yj-LvR">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
                                 <action selector="addButtonPressed:" destination="V1H-QR-LsL" id="XPy-Ye-t1c"/>
                             </connections>
@@ -111,7 +112,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="plus" catalog="system" width="32" height="32"/>
+        <image name="plus" catalog="system" width="128" height="113"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
