@@ -5,8 +5,9 @@
 Data storage was initially implemented in Core Data, then refactoring was carried out, and the data is now stored in Realm.
 Implemented a search using the native SearchBar element
 
-![Screenshot-1](Documentation/Todoey-1.png)
-
-![Screenshot-2](Documentation/Todoey-2.png)
-
-![Screenshot-3](Documentation/Todoey-3.png)
+  <tr>
+    <td><img src="Documentation/Todoey-1.png" width=270 height=480></td>
+    <td><img src="Documentation/Todoey-2.png" width=270 height=480></td>
+    <td><img src="Documentation/Todoey-3.png" width=270 height=480></td>
+  </tr>
+ 
